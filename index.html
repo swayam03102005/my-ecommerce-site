@@ -1,0 +1,140 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ShopMe — Home</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top-nav" role="banner">
+    <div class="logo"><a href="index.html"><img src="fulllogo.png" alt="ShopMe" /></a></div>
+
+    <form id="search-form" class="search-bar" role="search">
+      <label for="category" class="visually-hidden">Category</label>
+      <select id="category">
+        <option value="">All</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="books">Books</option>
+        <option value="homekitchen">Home & Kitchen</option>
+        <option value="clothes">Clothes</option>
+        <option value="sports">Sports</option>
+      </select>
+      <input id="search-input" type="text" placeholder="Search ShopMe.in" />
+      <button id="search-btn" type="submit">🔍</button>
+    </form>
+
+    <nav class="right-menu">
+      <select id="language-select" class="language-select" title="Language">
+        <option value="en" selected>English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="bn">বাংলা</option>
+        <option value="ta">தமிழ்</option>
+        <option value="te">తెలుగు</option>
+        <option value="mr">मराठी</option>
+        <option value="kn">ಕನ್ನಡ</option>
+        <option value="ml">മലയാളം</option>
+      </select>
+
+      <a href="#" class="clickable">Hello, sign in<br /><span class="bold-text">Account & Lists</span></a>
+      <a href="#" class="clickable">Returns<br /><span class="bold-text">& Orders</span></a>
+      <button id="cart-toggle">🛒 Cart (0)</button>
+    </nav>
+  </header>
+
+  <!-- ribbon below search -->
+  <div class="ribbon fade-in">
+    Today's deals: Free shipping over ₹999 • New arrivals • Festive offers
+  </div>
+
+  <!-- 3D banner preview (home shows a simplified banner) -->
+  <div class="banner-3d" aria-hidden="false">
+    <div class="banner-card" id="home-banner">
+      <div class="banner-slide active" style="background-image:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80');"></div>
+      <div class="banner-slide" style="background-image:url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1600&q=80');transform:translateZ(-60px) rotateY(-10deg)"></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="featured-categories">
+      <!-- category cards link to Subcategory.html with query param -->
+      <a class="category-card" href="Subcategory.html?cat=electronics" data-cat="electronics">
+        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80" alt="Electronics">
+        <div class="cat-body"><strong>Electronics</strong><div>Latest deals & gadgets</div></div>
+      </a>
+
+      <a class="category-card" href="Subcategory.html?cat=fashion" data-cat="fashion">
+        <img src="https://images.unsplash.com/photo-1503342217505-b0a15b5f1a3a?auto=format&fit=crop&w=800&q=80" alt="Fashion">
+        <div class="cat-body"><strong>Fashion</strong><div>Trendy clothing & accessories</div></div>
+      </a>
+
+      <a class="category-card" href="Subcategory.html?cat=books" data-cat="books">
+        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80" alt="Books">
+        <div class="cat-body"><strong>Books</strong><div>Read more, learn more</div></div>
+      </a>
+
+      <a class="category-card" href="Subcategory.html?cat=homekitchen" data-cat="homekitchen">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" alt="Home & Kitchen">
+        <div class="cat-body"><strong>Home & Kitchen</strong><div>Essentials & decor</div></div>
+      </a>
+
+      <a class="category-card" href="Subcategory.html?cat=clothes" data-cat="clothes">
+        <img src="https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=800&q=80" alt="Clothes">
+        <div class="cat-body"><strong>Clothes</strong><div>Casual & formal wear</div></div>
+      </a>
+
+      <a class="category-card" href="Subcategory.html?cat=sports" data-cat="sports">
+        <img src="https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=800&q=80" alt="Sports">
+        <div class="cat-body"><strong>Sports</strong><div>Fitness & outdoors</div></div>
+      </a>
+    </section>
+  </main>
+
+  <script src="db.js"></script>
+  <script>
+    // cart persistence & UI
+    const CART_KEY = 'shopme_cart_v1';
+    function loadCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY))||[] }catch(e){return []} }
+    function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)) }
+    function updateCartCount(){
+      const cart = loadCart();
+      const total = cart.reduce((s,i)=>s+i.qty,0);
+      document.getElementById('cart-toggle').textContent = `🛒 Cart (${total})`;
+    }
+    updateCartCount();
+
+    // language selection demo: store preference
+    const langSel = document.getElementById('language-select');
+    langSel.addEventListener('change', ()=>{ localStorage.setItem('shopme_lang', langSel.value); alert('Language changed to: '+langSel.options[langSel.selectedIndex].text) });
+
+    // search -> redirect to Subcategory page with query
+    document.getElementById('search-form').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const q = document.getElementById('search-input').value.trim();
+      const cat = document.getElementById('category').value;
+      if(!q){ alert('Please enter a search term.'); return; }
+      // navigate to subcategory page with query params
+      const params = new URLSearchParams();
+      if(cat) params.set('cat', cat);
+      params.set('q', q);
+      location.href = `Subcategory.html?${params.toString()}`;
+    });
+
+    // simple hover tilt for banner (3D feel)
+    const banner = document.querySelector('.banner-card');
+    banner && banner.addEventListener('mousemove', (ev)=>{
+      const rect = banner.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = ev.clientX - cx;
+      const dy = ev.clientY - cy;
+      const rx = (dy / rect.height) * 8; // tilt
+      const ry = -(dx / rect.width) * 12;
+      banner.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    });
+    banner && banner.addEventListener('mouseleave', ()=> banner.style.transform = '');
+  </script>
+</body>
+</html>
